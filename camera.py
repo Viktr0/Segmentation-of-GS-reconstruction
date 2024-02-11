@@ -127,7 +127,7 @@ class ImagePixels:
         self.image = cv2.imread(file_path)
         #self.mask = np.ones((self.image.shape[0], self.image.shape[1]))
 
-    def getUniqueColors(self):
+    def get_unique_colors(self):
 
         rows, cols, _ = self.image.shape
 
@@ -136,11 +136,11 @@ class ImagePixels:
             for j in range(cols):
                 c = self.image[i, j]
                 color = [c[0], c[1], c[2]]
-                if self.isUnique(color, unique_colors):
+                if self.is_unique(color, unique_colors):
                     unique_colors.append([color[0], color[1], color[2]])
         return unique_colors
 
-    def isUnique(self, color, colors):
+    def is_unique(self, color, colors):
 
         if len(colors) == 0:
             return True

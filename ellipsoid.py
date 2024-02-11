@@ -21,7 +21,7 @@ class Ellipsoid:
         print(self.op)
         print(self.id)
 
-    def isOnSurface(self, point):
+    def is_on_surface(self, point):
 
         diff = np.array(point - self.center)
         xM = np.dot(diff, np.linalg.inv(self.cov_mat))
