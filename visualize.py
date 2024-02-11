@@ -24,44 +24,50 @@ color_lst = [
 ]
 
 
-def visualize(el, load_path, segment_list=[], show_ellipsoids=False):
+class Visualizer:
+    def __init__(self, ellipsoid_list):
+        self.el = ellipsoid_list
 
-    with open(load_path, 'r') as file:
-        label_lists = json.load(file)
+    def visualize(self, load_path, segment_list=[], show_ellipsoids=False):
 
-    if len(segment_list) == 0:
-        segment_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        with open(load_path, 'r') as file:
+            label_lists = json.load(file)
 
-    counter = 0
-    coords = np.zeros((1, 3))
-    colors = np.zeros((1, 3))
-    for i in range(0, len(label_lists)):
-        if len(label_lists[i]) != 0:
-            counter += 1
-            modus = statistics.mode(label_lists[i])
-            if modus in segment_list:
-                c = el.ellipsoids[i].center
-                coords = np.append(coords, c.reshape(1, -1), axis=0)
-                colors = np.append(colors, (color_lst[modus] / 255.0).reshape(1, -1), axis=0)
-                if show_ellipsoids:
-                    c_m = el.ellispoids[i].cov_mat
-                    new_ellipsoid = Ellipsoid(c, c_m)
-                    coords = np.append(coords, new_ellipsoid.get_points(steps=10), axis=0)
-    print(counter)
+        if len(segment_list) == 0:
+            segment_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
-    pcd = o3d.geometry.PointCloud()
-    pcd.points = o3d.utility.Vector3dVector(coords)
-    if show_ellipsoids is False:
-        pcd.colors = o3d.utility.Vector3dVector(colors)
-    o3d.visualization.draw_geometries([pcd])
+        counter = 0
+        coords = np.zeros((1, 3))
+        colors = np.zeros((1, 3))
+        for i in range(0, len(label_lists)):
+            if len(label_lists[i]) != 0:
+                counter += 1
+                modus = statistics.mode(label_lists[i])
+                if modus in segment_list:
+                    c = self.el.ellipsoids[i].center
+                    coords = np.append(coords, c.reshape(1, -1), axis=0)
+                    colors = np.append(colors, (color_lst[modus] / 255.0).reshape(1, -1), axis=0)
+                    if show_ellipsoids:
+                        c_m = self.el.ellispoids[i].cov_mat
+                        new_ellipsoid = Ellipsoid(c, c_m)
+                        coords = np.append(coords, new_ellipsoid.get_points(steps=10), axis=0)
+        print(counter)
 
+        pcd = o3d.geometry.PointCloud()
+        pcd.points = o3d.utility.Vector3dVector(coords)
+        if show_ellipsoids is False:
+            pcd.colors = o3d.utility.Vector3dVector(colors)
+        o3d.visualization.draw_geometries([pcd])
 
 if __name__ == '__main__':
 
     el_path = "data\point_cloud.ply"
     el = EllipsoidList(polygon_data_path=el_path)
 
-    load_path = "data\labels_0-245.json" # "data\labels_100.json"
+    visualizer = Visualizer(ellipsoid_list=el)
+
+    label_path = "data\labels_0-245.json" # "data\labels_100.json"
+    s_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
     # Visualization of the labeled ellipsoids by their centers
-    visualize(el, load_path="data\labels_0-245.json", segment_list=[1,2,3,4,5,6,7,8,9,10], show_ellipsoids=False)
+    visualizer.visualize(load_path=label_path, segment_list=s_list, show_ellipsoids=False)
